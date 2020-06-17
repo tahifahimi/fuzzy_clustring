@@ -86,7 +86,16 @@ def fcm(c):
         # assign new center to each data point
         labels = change_clusters(u)
         iteration_number += 1
-    return labels
+
+    # calculate the Error
+    error = 0.0
+    for k in range(n):
+        x_y = list(df.iloc[k])
+        # calculate distance of the data point from all centers ---> ||xk - vj||
+        distances = [np.linalg.norm(list(map(operator.sub, x_y, centers[i])))**2 for i in range(c)]
+        for i in range(c):
+            error += distances[i]*u[k][i]
+    return labels, error
 
 
 # draw the final vision of the coordinates
@@ -102,13 +111,14 @@ def plot(labels):
             plt.scatter(array[0], array[1], color=colors[2])
         else:
             plt.scatter(array[0], array[1], color=colors[3])
-    # plt.savefig('.png')
+    plt.savefig(file_name+str(c)+'.png')
     plt.show()
 
 
 if __name__ == "__main__":
     # read file and initiate the values
-    df_full = pd.read_csv("sample3.csv")
+    file_name = "sample3.csv"
+    df_full = pd.read_csv(file_name)
     columns = list(df_full.columns)
     features = columns[:len(columns)]
     # print(features)
@@ -116,14 +126,15 @@ if __name__ == "__main__":
     df = df_full[features]
     print("the first coordinate", list(df.iloc[0]))
     # Number of Clusters
-    c = 2
+    c = 7
     # Maximum number of iterations
     maximum_iteration = 10
     # Number of data points
     n = len(df)
     # Fuzzy parameter
-    m = 1.80
+    m = 1.20
 
-    labels = fcm(c)
-    print("the labels are", labels)
+    labels, error = fcm(c)
+    # print("the labels are", labels)
+    print("the error is:", error)
     plot(labels)
