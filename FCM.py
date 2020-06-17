@@ -7,7 +7,7 @@ import random
 import operator
 import math
 from matplotlib import pyplot as plt
-
+from matplotlib.patches import Rectangle
 
 # assign value randomly to the fuzzy value quantities
 def initialize_fuzzy_quantities():
@@ -95,29 +95,48 @@ def fcm(c):
         distances = [np.linalg.norm(list(map(operator.sub, x_y, centers[i])))**2 for i in range(c)]
         for i in range(c):
             error += distances[i]*u[k][i]
-    return labels, error
+
+    return labels, error, centers
 
 
 # draw the final vision of the coordinates
-def plot(labels):
-    colors = ["r", "b", "g", "y"]
+def plot(labels, centers):
+    ax = plt.figure().add_subplot(111)
+    colors = ["r", "b", "g", "y", "c", "m", "y", "k", "gray"]
     for i in range(n):
         array = list(df.iloc[i])
         if labels[i] == 0:
-            plt.scatter(array[0], array[1], color=colors[1])
+            ax.scatter(array[0], array[1], color=colors[0])
         elif labels[i] == 1:
-            plt.scatter(array[0], array[1], color=colors[0])
+            ax.scatter(array[0], array[1], color=colors[1])
         elif labels[i] == 2:
-            plt.scatter(array[0], array[1], color=colors[2])
+            ax.scatter(array[0], array[1], color=colors[2])
+        elif labels[i] == 3:
+            ax.scatter(array[0], array[1], color=colors[3])
+        elif labels[i] == 4:
+            ax.scatter(array[0], array[1], color=colors[4])
+        elif labels[i] == 5:
+            ax.scatter(array[0], array[1], color=colors[5])
+        elif labels[i] == 6:
+            ax.scatter(array[0], array[1], color=colors[6])
         else:
-            plt.scatter(array[0], array[1], color=colors[3])
-    plt.savefig(file_name+str(c)+'.png')
-    plt.show()
+            ax.scatter(array[0], array[1], color=colors[7])
+    # Add rectangles
+    width = 0.01
+    height = 0.01
+    for x in centers:
+        a_x, a_y = x[0], x[1]
+        ax.add_patch(
+            Rectangle(xy=(a_x - width / 2, a_y - height / 2), width=width, height=height, linewidth=1, color='blue',
+                      fill=False))
+    ax.axis('equal')
+    plt.savefig(file_name+"clusterNo"+str(c)+'.png')
+    # plt.show()
 
 
 if __name__ == "__main__":
     # read file and initiate the values
-    file_name = "sample3.csv"
+    file_name = "sample4.csv"
     df_full = pd.read_csv(file_name)
     columns = list(df_full.columns)
     features = columns[:len(columns)]
@@ -125,16 +144,17 @@ if __name__ == "__main__":
     class_labels = list(df_full[columns[-1]])
     df = df_full[features]
     print("the first coordinate", list(df.iloc[0]))
-    # Number of Clusters
-    c = 7
     # Maximum number of iterations
-    maximum_iteration = 10
+    maximum_iteration = 50
     # Number of data points
     n = len(df)
     # Fuzzy parameter
     m = 1.20
 
-    labels, error = fcm(c)
-    # print("the labels are", labels)
-    print("the error is:", error)
-    plot(labels)
+    for i in range(2, 9):
+        # Number of Clusters
+        c = i
+        labels, error, centers = fcm(c)
+        # print("the labels are", labels)
+        print(error)
+        plot(labels, centers)
