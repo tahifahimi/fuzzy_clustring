@@ -145,16 +145,20 @@ if __name__ == "__main__":
     df = df_full[features]
     print("the first coordinate", list(df.iloc[0]))
     # Maximum number of iterations
-    maximum_iteration = 50
+    maximum_iteration = 1000
     # Number of data points
     n = len(df)
     # Fuzzy parameter
-    m = 1.20
+    m = 1.2
 
-    for i in range(2, 9):
-        # Number of Clusters
-        c = i
-        labels, error, centers = fcm(c)
-        # print("the labels are", labels)
-        print(error)
-        plot(labels, centers)
+    c = 4
+    labels, error, centers = fcm(c)
+    print(error)
+    plot(labels, centers)
+    # for i in range(2, 9):
+    #     # Number of Clusters
+    #     c = i
+    #     labels, error, centers = fcm(c)
+    #     # print("the labels are", labels)
+    #     print(error)
+    #     plot(labels, centers)
