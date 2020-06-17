@@ -151,14 +151,10 @@ if __name__ == "__main__":
     # Fuzzy parameter
     m = 1.2
 
-    c = 4
-    labels, error, centers = fcm(c)
-    print(error)
-    plot(labels, centers)
-    # for i in range(2, 9):
-    #     # Number of Clusters
-    #     c = i
-    #     labels, error, centers = fcm(c)
-    #     # print("the labels are", labels)
-    #     print(error)
-    #     plot(labels, centers)
+    # find the best clustering number from 2 - 8
+    for i in range(2, 9):
+        # Number of Clusters
+        c = i
+        labels, error, centers = fcm(c)
+        print(error)
+        plot(labels, centers)
