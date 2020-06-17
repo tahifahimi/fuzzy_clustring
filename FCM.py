@@ -1,3 +1,6 @@
+"""Tahere Fahimi 9539045
+    fuzzy clustering method"""
+
 import pandas as pd
 import numpy as np
 import random
@@ -28,38 +31,46 @@ def find_Centers(u, c):
             cluster_quantity[i].append(u[s][i])
 
     cluster_centers = list()
-    # check this part ...............................................
     for j in range(c):
         x = cluster_quantity[j]
+        # calculate all u^m
         xraised = [e ** m for e in x]
+        # Denominator of the division
         denominator = sum(xraised)
         temp_num = list()
+        # numerator of the division
         for i in range(n):
             data_point = list(df.iloc[i])
             prod = [xraised[i] * val for val in data_point]
             temp_num.append(prod)
         numerator = map(sum, zip(*temp_num))
+        # divide the numerator / denominator
         center = [z / denominator for z in numerator]
+        # add new center
         cluster_centers.append(center)
     return cluster_centers
 
 
-def updateMembershipValue(u, cluster_centers):
-    p = float(2 / (m - 1))
+def update_fuzzy_quantities(u, cluster_centers):
+    power = float(2 / (m - 1))
     for i in range(n):
         x_y = list(df.iloc[i])
+        # calculate distance of the data point from all centers ---> ||xk - vj||
         distances = [np.linalg.norm(list(map(operator.sub, x_y, cluster_centers[j]))) for j in range(c)]
+        # ||xk - vi||/ ||xk-vj||
         for j in range(c):
-            den = sum([math.pow(float(distances[j] / distances[k]), p) for k in range(c)])
+            den = sum([math.pow(float(distances[j] / distances[k]), power) for k in range(c)])
             u[i][j] = float(1 / den)
     return u
 
 
+# assign new cluster to each data point ---> find the biggest fuzzy
+# quantities for each node and assign that center to that data
 def change_clusters(u):
     cluster_labels = list()
     for i in range(n):
-        max_val, idx = max((val, idx) for (idx, val) in enumerate(u[i]))
-        cluster_labels.append(idx)
+        max_val, index = max((val, idx) for (idx, val) in enumerate(u[i]))
+        cluster_labels.append(index)
     return cluster_labels
 
 
@@ -68,8 +79,11 @@ def fcm(c):
     u = initialize_fuzzy_quantities()
     iteration_number = 0
     while iteration_number <= maximum_iteration:
+        # find new centers
         centers = find_Centers(u, c)
-        u = updateMembershipValue(u, centers)
+        # calculate fuzzy quantities based on new centers
+        u = update_fuzzy_quantities(u, centers)
+        # assign new center to each data point
         labels = change_clusters(u)
         iteration_number += 1
     return labels
@@ -102,7 +116,7 @@ if __name__ == "__main__":
     df = df_full[features]
     print("the first coordinate", list(df.iloc[0]))
     # Number of Clusters
-    c = 4
+    c = 2
     # Maximum number of iterations
     maximum_iteration = 10
     # Number of data points
